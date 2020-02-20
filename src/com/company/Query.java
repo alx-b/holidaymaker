@@ -67,6 +67,10 @@ public class Query {
         disconnectFromDatabase();
     }
 
+    public void checkIfARoomIsAvailableDuringTheDates(){
+
+    }
+
     private void connectToDatabase() {
         try {
             this.conn = DriverManager.getConnection("jdbc:mysql://localhost/holidaymaker_database?user=root&password=mysql&serverTimezone=UTC");
