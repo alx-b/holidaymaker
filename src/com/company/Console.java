@@ -24,24 +24,43 @@ public class Console {
 
     private void addNewBooking(){
         // return the info and keep it and only add it all at the end if all is fine
-        addCustomerToDatabase();
+        String customerID = addCustomerToDatabase();
         // again return the choice "id"
-        selectPlaceToStayAt();
-
-        chooseDates();
+        String placeID = selectPlaceToStayAt();
+        String[] dates = chooseDates();
+        String beginDate = dates[0];
+        String endDate = dates[1];
+        String totalGuests = addHowManyGuestsAreStaying();
+        this.query.checkIfARoomIsAvailableDuringTheDates(beginDate, endDate, placeID, totalGuests);
+        String roomID = selectRoomToStayAt();
+        this.query.addNewBookingToDatabase(beginDate, endDate, customerID, roomID, placeID, totalGuests);
+        System.out.printf("%s %s cID: %s - rID: %s - pID: %s - totalGuest: %s\n", beginDate, endDate,customerID,roomID,placeID,totalGuests);
     }
 
-    private void addCustomerToDatabase(){
+    private String addCustomerToDatabase(){
         System.out.print("Enter first name: ");
         String name = scan.nextLine();
         System.out.print("Enter last name: ");
         String lastName = scan.nextLine();
         System.out.print("Enter NHS number: ");
         String nhsNumber = scan.nextLine();
-        this.query.addNewCustomer(name, lastName, nhsNumber);
+        return this.query.addNewCustomer(name, lastName, nhsNumber);
     }
 
-    private void selectPlaceToStayAt(){
+    private String addHowManyGuestsAreStaying(){
+        System.out.println("How many guests are staying?");
+        System.out.print("Enter a number between 1 to 5: ");
+        String choice = scan.nextLine();
+        return choice;
+    }
+
+    private String selectRoomToStayAt(){
+        System.out.print("Enter a number: ");
+        String choice = scan.nextLine();
+        return choice;
+    }
+
+    private String selectPlaceToStayAt(){
         query.selectPlace();
         System.out.print("Enter a number: ");
         String choice = scan.nextLine();
@@ -49,9 +68,11 @@ public class Console {
             case "1": case "2": case "3": case "4": case "5":
                 System.out.println("-- Location includes --");
                 query.includedAtLocation(choice);
-                break;
+                System.out.println("-----------------------");
+                return choice;
             default: System.out.println("DEFAULT");
         }
+        return null;
     }
 
     private boolean dateIsValid(String date){
@@ -90,10 +111,10 @@ public class Console {
         }
     }
 
-    private void chooseDates(){
+    private String[] chooseDates(){
         String arrivalDate;
         while (true){
-            System.out.println("Give arrival date in a YYYY-MM-DD format: ");
+            System.out.print("Give arrival date in a YYYY-MM-DD format: ");
             arrivalDate = scan.nextLine();
             if (arrivalDate.matches("\\d{4}-\\d{2}-\\d{2}")){
                 if (dateIsValid(arrivalDate)){
@@ -105,7 +126,7 @@ public class Console {
         }
         String departureDate;
         while (true){
-            System.out.println("Give departure date in a YYYY-MM-DD format: ");
+            System.out.print("Give departure date in a YYYY-MM-DD format: ");
             departureDate = scan.nextLine();
             if (departureDate.matches("\\d{4}-\\d{2}-\\d{2}")){
                 if (dateIsValid(departureDate) && departureDateIsLaterThanArrivalDate(arrivalDate, departureDate))
@@ -116,6 +137,7 @@ public class Console {
                 }
             }
         }
+        return new String[]{arrivalDate, departureDate};
     }
 
     public boolean choiceFromMenu(){
