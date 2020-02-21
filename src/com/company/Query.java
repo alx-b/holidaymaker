@@ -42,7 +42,7 @@ public class Query {
         return customerID;
     }
 
-    public void addNewBookingToDatabase(String beginDate, String endDate, String customerID, String roomID, String placeID, String totalGuests){
+    public String addNewBookingToDatabase(String beginDate, String endDate, String customerID, String roomID, String placeID, String totalGuests){
         connectToDatabase();
         try {
             this.statement = this.conn.prepareStatement("INSERT INTO bookings (begin_date, end_date, customer_id, room_id, place_id, total_guests) " +
@@ -55,6 +55,57 @@ public class Query {
             this.statement.setString(6, totalGuests);
             this.statement.executeUpdate();
             System.out.println("Booking was added to the database.");
+            return getIDOfBookingFrom(beginDate, endDate, customerID, roomID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+        return null;
+    }
+
+    public String getIDOfBookingFrom(String beginDate, String endDate, String customerID, String roomID){
+        try{
+            this.statement = this.conn.prepareStatement("SELECT * FROM bookings WHERE begin_date=? AND end_date=? AND customer_id=? AND room_id=?");
+            this.statement.setString(1, beginDate);
+            this.statement.setString(2, endDate);
+            this.statement.setString(3, customerID);
+            this.statement.setString(4, roomID);
+            this.resultSet = statement.executeQuery();
+            this.resultSet.next();
+            String bookingID = resultSet.getString("id");
+            return bookingID;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void linkBookingWithAddon(String bookingID, String addonID){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("INSERT INTO bookings_and_addons (booking_id, addon_id) VALUES (?, ?);");
+            this.statement.setString(1, bookingID);
+            this.statement.setString(2, addonID);
+            this.statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+    }
+
+    public void displayAddons(){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("SELECT * FROM Addons");
+            this.resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                System.out.printf(
+                        "%d. %s - %s kr\n",
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("price")
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

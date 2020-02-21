@@ -33,8 +33,18 @@ public class Console {
         String totalGuests = addHowManyGuestsAreStaying();
         this.query.checkIfARoomIsAvailableDuringTheDates(beginDate, endDate, placeID, totalGuests);
         String roomID = selectRoomToStayAt();
-        this.query.addNewBookingToDatabase(beginDate, endDate, customerID, roomID, placeID, totalGuests);
+        String bookingID = this.query.addNewBookingToDatabase(beginDate, endDate, customerID, roomID, placeID, totalGuests);
         System.out.printf("%s %s cID: %s - rID: %s - pID: %s - totalGuest: %s\n", beginDate, endDate,customerID,roomID,placeID,totalGuests);
+        System.out.printf("BOOKING ID: %s", bookingID);
+        String addonID = addAddons();
+        this.query.linkBookingWithAddon(bookingID, addonID);
+    }
+
+    private String addAddons(){
+        System.out.println("Do you want to have some Addons?");
+        this.query.displayAddons();
+        System.out.print("Enter a number: ");
+        return scan.nextLine();
     }
 
     private String addCustomerToDatabase(){
