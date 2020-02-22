@@ -65,6 +65,7 @@ public class Query {
 
     public String getIDOfBookingFrom(String beginDate, String endDate, String customerID, String roomID){
         try{
+            connectToDatabase();
             this.statement = this.conn.prepareStatement("SELECT * FROM bookings WHERE begin_date=? AND end_date=? AND customer_id=? AND room_id=?");
             this.statement.setString(1, beginDate);
             this.statement.setString(2, endDate);
@@ -73,10 +74,12 @@ public class Query {
             this.resultSet = statement.executeQuery();
             this.resultSet.next();
             String bookingID = resultSet.getString("id");
+            disconnectFromDatabase();
             return bookingID;
         } catch (Exception e){
             e.printStackTrace();
         }
+        disconnectFromDatabase();
         return null;
     }
 
@@ -87,6 +90,61 @@ public class Query {
             this.statement.setString(1, bookingID);
             this.statement.setString(2, addonID);
             this.statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+    }
+
+    public void deleteCustomerWithID(String customerID){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("DELETE FROM customers WHERE id=?;");
+            this.statement.setString(1, customerID);
+            this.statement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+    }
+
+    public String deleteBookingWithID(String bookingID){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("SELECT customer_id FROM bookings WHERE id=?;");
+            this.statement.setString(1, bookingID);
+            this.resultSet = statement.executeQuery();
+            this.resultSet.next();
+            String customerID = resultSet.getString("customer_id");
+
+            this.statement = this.conn.prepareStatement("DELETE FROM bookings WHERE id=?;");
+            this.statement.setString(1, bookingID);
+            this.statement.executeUpdate();
+            disconnectFromDatabase();
+            return customerID;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+        return null;
+    }
+
+    public void displayAllBookings(){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("SELECT bookings.id, begin_date, end_date, customers.* FROM bookings INNER JOIN customers ON customer_id=customers.id;");
+            this.resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                System.out.printf(
+                        "%d. %s-%s - FullName: %s %s - NHS number: %s\n",
+                        resultSet.getInt("id"),
+                        resultSet.getString("begin_date"),
+                        resultSet.getString("end_date"),
+                        resultSet.getString("name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("nhs_number")
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,13 +229,15 @@ public class Query {
             this.statement.setInt(6, intTotalGuests);
             this.resultSet = statement.executeQuery();
             while (resultSet.next()){
+                int totalMaxGuests = resultSet.getInt("max_guests") + 1;
                 System.out.printf(
-                        "%d. Room #: %s - Size: %s - Max guests: %d (without extra bed) - Place: %s\n",
+                        "%d. Room #: %s - Size: %s - Max guests: %d (%6$d with an extra bed) - Place: %s\n",
                         resultSet.getInt("rooms.id"),
                         resultSet.getString("room_number"),
                         resultSet.getString("size_name"),
                         resultSet.getInt("max_guests"),
-                        resultSet.getString("name")
+                        resultSet.getString("name"),
+                        totalMaxGuests
                 );
             }
         } catch (Exception e){

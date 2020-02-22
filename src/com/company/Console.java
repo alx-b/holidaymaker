@@ -17,8 +17,7 @@ public class Console {
                         "1. Add a new booking.\n" +
                         "2. Update a booking.\n" +
                         "3. Delete a booking.\n" +
-                        "4. Search...\n" +
-                        "5. Quit.\n"
+                        "4. Quit.\n"
         );
     }
 
@@ -150,14 +149,26 @@ public class Console {
         return new String[]{arrivalDate, departureDate};
     }
 
+    private void deleteBooking(){
+        this.query.displayAllBookings();
+        System.out.print("Enter a number: ");
+        String choice = scan.nextLine();
+        String customerID = this.query.deleteBookingWithID(choice);
+        System.out.println("Do you want to delete the customer from the database?");
+        System.out.print("Enter 'y' for 'yes', anything else for 'no': ");
+        String choice2 = scan.nextLine();
+        if (choice2.equals("y")){
+            this.query.deleteCustomerWithID(customerID);
+        }
+    }
+
     public boolean choiceFromMenu(){
         System.out.print("Enter a number: ");
         switch (scan.nextLine()){
             case "1": addNewBooking(); break;
-            case "2": System.out.println("TWO"); break;
-            case "3": System.out.println("THREE"); break;
-            case "4": System.out.println("FOUR"); break;
-            case "5": System.out.println("QUIT"); return false;
+            case "2": System.out.println("NOT AVAILABLE"); break;
+            case "3": deleteBooking(); break;
+            case "4": System.out.println("QUIT"); return false;
             default: System.out.println("DEFAULT");
         }
         return true;
