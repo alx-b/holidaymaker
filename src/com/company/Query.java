@@ -191,7 +191,6 @@ public class Query {
         }
         disconnectFromDatabase();
     }
-    //"select * from rooms inner join places on rooms.place_id = places.id WHERE rooms.place_id = 1"
 
     public void includedAtLocation(String placeID){
         connectToDatabase();

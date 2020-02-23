@@ -23,9 +23,7 @@ public class Console {
     }
 
     private void addNewBooking(){
-        // return the info and keep it and only add it all at the end if all is fine
         String customerID = addCustomerToDatabase();
-        // again return the choice "id"
         String placeID = selectPlaceToStayAt();
         String[] dates = chooseDates();
         String beginDate = dates[0];
@@ -110,8 +108,6 @@ public class Console {
     }
 
     private boolean departureDateIsLaterThanArrivalDate(String arrivalDate, String departureDate){
-        //int arrivalDay = Integer.parseInt(arrivalDate.substring(8, 10));
-        //int departureDay = Integer.parseInt(departureDate.substring(8, 10));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date arrival = dateFormat.parse(arrivalDate);
