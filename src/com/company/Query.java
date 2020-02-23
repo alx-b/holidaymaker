@@ -201,7 +201,48 @@ public class Query {
             this.resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 System.out.printf(
-                        "%s.\n",
+                        "%s\n",
+                        resultSet.getString("name")
+                );
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+    }
+
+    public void displayPlacesWithSpecificAccessTo(String accessID){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("SELECT places.name FROM places_and_access INNER JOIN places ON place_id = places.id WHERE access_id = ?;");
+            this.statement.setString(1, accessID);
+            this.resultSet = statement.executeQuery();
+            this.statement = this.conn.prepareStatement("SELECT name FROM access_to WHERE id=?");
+            this.statement.setString(1, accessID);
+            ResultSet resultSet2 = statement.executeQuery();
+            resultSet2.next();
+            System.out.println("---- These places offer " + resultSet2.getString("name") + " ----");
+            while (resultSet.next()) {
+                System.out.printf(
+                        "%s\n",
+                        resultSet.getString("name")
+                );
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        disconnectFromDatabase();
+    }
+
+    public void displayAllAccessOnPlaces(){
+        connectToDatabase();
+        try {
+            this.statement = this.conn.prepareStatement("SELECT id, name FROM access_to;");
+            this.resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                System.out.printf(
+                        "%d. %s\n",
+                        resultSet.getInt("id"),
                         resultSet.getString("name")
                 );
             }

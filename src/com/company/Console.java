@@ -14,10 +14,11 @@ public class Console {
     public void displayMenu(){
         System.out.println("---- MENU ----");
         System.out.print(
-                        "1. Add a new booking.\n" +
-                        "2. Update a booking.\n" +
-                        "3. Delete a booking.\n" +
-                        "4. Quit.\n"
+                        "1. Add a new booking\n" +
+                        "2. Update a booking\n" +
+                        "3. Delete a booking\n" +
+                        "4. Search for a place with specific access to a location\n" +
+                        "5. Quit\n"
         );
     }
 
@@ -33,10 +34,15 @@ public class Console {
         this.query.checkIfARoomIsAvailableDuringTheDates(beginDate, endDate, placeID, totalGuests);
         String roomID = selectRoomToStayAt();
         String bookingID = this.query.addNewBookingToDatabase(beginDate, endDate, customerID, roomID, placeID, totalGuests);
-        System.out.printf("%s %s cID: %s - rID: %s - pID: %s - totalGuest: %s\n", beginDate, endDate,customerID,roomID,placeID,totalGuests);
-        System.out.printf("BOOKING ID: %s", bookingID);
         String addonID = addAddons();
         this.query.linkBookingWithAddon(bookingID, addonID);
+    }
+
+    private void searchPlaceByWhatItOffersAccessTo(){
+        this.query.displayAllAccessOnPlaces();
+        System.out.print("Enter a number: ");
+        String choice = scan.nextLine();
+        this.query.displayPlacesWithSpecificAccessTo(choice);
     }
 
     private String addAddons(){
@@ -79,18 +85,15 @@ public class Console {
                 query.includedAtLocation(choice);
                 System.out.println("-----------------------");
                 return choice;
-            default: System.out.println("DEFAULT");
+            default: System.out.println("Not a number between 1 and 5");
         }
         return null;
     }
 
     private boolean dateIsValid(String date){
         int year = Integer.parseInt(date.substring(0, 4));
-        System.out.println(year);
         String month = date.substring(5, 7);
-        System.out.println(month);
         int day = Integer.parseInt(date.substring(8,10));
-        System.out.println(day);
         return yearIsCurrentOrLater(year) && monthIsJuneOrJuly(month) && dayIsValid(day);
     }
 
@@ -168,8 +171,9 @@ public class Console {
             case "1": addNewBooking(); break;
             case "2": System.out.println("NOT AVAILABLE"); break;
             case "3": deleteBooking(); break;
-            case "4": System.out.println("QUIT"); return false;
-            default: System.out.println("DEFAULT");
+            case "4": searchPlaceByWhatItOffersAccessTo(); break;
+            case "5": System.out.println("QUIT"); return false;
+            default: System.out.println("Not a number between 1 and 5.");
         }
         return true;
     }
